@@ -14,7 +14,6 @@ public class BluetoothDeviceDiscovery implements DiscoveryListener{
 
     //Vector containing the diveces discovered.
     public static Vector<RemoteDevice> vecDevices=new Vector<>();
-
     //main method of the application
     public static void main(String[] args) throws IOException{
         //Create an instance of this class.
@@ -30,7 +29,6 @@ public class BluetoothDeviceDiscovery implements DiscoveryListener{
         System.out.println("Starting device inquiry...");
         //bluetoothDeviceDiscover implements DiscoveryListener
         agent.startInquiry(DiscoveryAgent.GIAC,bluetoothDeviceDiscovery);
-
         try {
             synchronized (lock){
                 lock.wait();

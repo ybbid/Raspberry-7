@@ -40,5 +40,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" exported="" name="bluecove-2.1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="bluecove-gpl-2.1.1-SNAPSHOT" level="project" />
   </component>
 </module>

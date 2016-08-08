@@ -27,7 +27,7 @@ public class SppClient {
         //send test string
         OutputStream ops=streamConnection.openOutputStream();
         System.out.println("send test string...");
-        String hexstr="cc96020301010001";
+        String hexstr="cc96020301010002";
         byte[] rq=HexStringToBinary(hexstr);
         ops.write(rq);
         ops.flush();
