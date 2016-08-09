@@ -17,7 +17,7 @@ public class BluetoothDeviceDiscovery implements Runnable{
     public final static LocalDevice localDevice=getLocalDevice();
 
     //对象锁
-    public final static Object lock=new Object();
+    public final static Object dislock =new Object();
     private static boolean isSearched=false;
     private BluetoothDeviceDiscovery(){
 
@@ -39,10 +39,10 @@ public class BluetoothDeviceDiscovery implements Runnable{
         DiscoveryAgent agent=localDevice.getDiscoveryAgent();
         DiscoveryListenerImpl listener=new DiscoveryListenerImpl();
         while (true){
-            synchronized (lock){
+            synchronized (dislock){
                 try {
                     agent.startInquiry(DiscoveryAgent.GIAC,listener);
-                    lock.wait();
+                    dislock.wait();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

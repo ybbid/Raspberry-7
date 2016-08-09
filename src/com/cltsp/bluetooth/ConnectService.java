@@ -1,13 +1,31 @@
 package com.cltsp.bluetooth;
 
-import javax.bluetooth.UUID;
+import static com.cltsp.bluetooth.BluetoothDeviceDiscovery.remDevices;
 
 /**
  * Created by leacher on 16-8-3.
  */
-public class ConnectService {
-    //This is common services UUID,can search more services UUID in internet.
-    static final UUID SerialPort=new UUID(0x1101);
-    static final UUID OBEX_OBJECT_PUSH=new UUID(0x1105);
-    static final UUID OBEX_FILE_TRANSFER=new UUID(0x1106);
+public class ConnectService implements Runnable {
+    public final static Object conlock=new Object();
+
+    @Override
+    public void run() {
+        synchronized (conlock){
+            try {
+                conlock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //取出刚刚发现的设备去建立连接
+            RFCOMMThread rt=new RFCOMMThread(remDevices.getLast());
+            rt.start();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        BluetoothDeviceDiscovery.startSearch();
+        ConnectService connectService=new ConnectService();
+        connectService.run();
+    }
 }
