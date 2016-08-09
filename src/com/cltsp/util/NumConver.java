@@ -5,15 +5,13 @@ import java.math.BigInteger;
 /**
  * Created by leacher on 16-8-8.
  */
-public class numConversion {
+public class NumConver {
     /*进制转换*/
-
 
     public static String binary(byte[] bytes, int radix){
         //// TODO: 16-8-8 二进制转换成radix进制字符串
         return (new BigInteger(1,bytes)).toString(radix);
     }
-
 
     public static byte[] HexStringToBinary(String src){
         // TODO: 16-8-8 16进制字符串,转换成二进制数组

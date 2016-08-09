@@ -1,96 +1,61 @@
 package com.cltsp.bluetooth;
 
-import javax.bluetooth.*;
-import java.io.IOException;
-import java.util.Vector;
+import com.cltsp.impl.DiscoveryListenerImpl;
+
+import javax.bluetooth.BluetoothStateException;
+import javax.bluetooth.DiscoveryAgent;
+import javax.bluetooth.LocalDevice;
+import javax.bluetooth.RemoteDevice;
+import java.util.LinkedList;
 
 /**
  * Created by leacher on 16-8-3.
  */
-public class BluetoothDeviceDiscovery implements DiscoveryListener{
+public class BluetoothDeviceDiscovery implements Runnable{
+    /*Linkedlist 不是线程安全的,用来存储在线的蓝牙设备*/
+    public final static LinkedList<RemoteDevice> remDevices=new LinkedList<>();
+    public final static LocalDevice localDevice=getLocalDevice();
 
-    //Object used for waiting,private lock.method wait and notify owned Object class.
-    private final static Object lock=new Object();
+    //对象锁
+    public final static Object lock=new Object();
+    private static boolean isSearched=false;
+    private BluetoothDeviceDiscovery(){
 
-    //Vector containing the diveces discovered.
-    public static Vector<RemoteDevice> vecDevices=new Vector<>();
-    //main method of the application
-    public static void main(String[] args) throws IOException{
-        //Create an instance of this class.
-        BluetoothDeviceDiscovery bluetoothDeviceDiscovery=new BluetoothDeviceDiscovery();
+    }
 
-        //Display local device address and name
-        LocalDevice localDevice=LocalDevice.getLocalDevice();
-        System.out.println("Address : "+localDevice.getBluetoothAddress());
-        System.out.println("Name : "+localDevice.getFriendlyName());
+    public static void startSearch(){
+        //确保只有一个线程
+        if (!isSearched){
+            Thread Search=new Thread(new BluetoothDeviceDiscovery());
+            Search.start();
+            isSearched=true;
+        }
+    }
 
-        //Find devices
+
+    @Override
+    public void run() {
+        remDevices.clear();
         DiscoveryAgent agent=localDevice.getDiscoveryAgent();
-        System.out.println("Starting device inquiry...");
-        //bluetoothDeviceDiscover implements DiscoveryListener
-        agent.startInquiry(DiscoveryAgent.GIAC,bluetoothDeviceDiscovery);
-        try {
+        DiscoveryListenerImpl listener=new DiscoveryListenerImpl();
+        while (true){
             synchronized (lock){
-                lock.wait();
-            }
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
-
-
-        /*In there,code mast wait released lock then continue. */
-        System.out.println("Device inquiry completed.");
-        //Print all devices in vecDevices
-        int deviceCount=vecDevices.size();
-
-        if (deviceCount<=0){
-            System.out.println("No Devices Found.");
-        }else {
-            System.out.println("Bluetooth Devices:");
-            for (int i=0;i<deviceCount;i++){
-                RemoteDevice remoteDevice=vecDevices.elementAt(i);
-                System.out.println((i+1)+". "+remoteDevice.getBluetoothAddress()+"("+remoteDevice.getFriendlyName(true)+")");
+                try {
+                    agent.startInquiry(DiscoveryAgent.GIAC,listener);
+                    lock.wait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    /*This call back method will be called for each discovered blutooth devices.*/
-    @Override
-    public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
-        System.out.println("Device discovered : "+remoteDevice.getBluetoothAddress());
-        //Add the devices to the vector
-        if (!vecDevices.contains(remoteDevice)){
-            vecDevices.addElement(remoteDevice);
+    private static LocalDevice getLocalDevice(){
+        try {
+            return LocalDevice.getLocalDevice();
+        } catch (BluetoothStateException e) {
+            return null;
         }
     }
 
-    //No need to implements this method since services are not being discovered.
-    @Override
-    public void servicesDiscovered(int transID, ServiceRecord[] serviceRecords) {}
-
-    //No need to implements this method since sercices are not being discovered.
-    @Override
-    public void serviceSearchCompleted(int transID, int respCode) {}
-
-
-    @Override
-    public void inquiryCompleted(int discType) {
-        synchronized (lock){
-            lock.notify();
-        }
-        switch (discType){
-            case DiscoveryListener.INQUIRY_COMPLETED:
-                System.out.println("Inquiry completed.");
-                break;
-            case DiscoveryListener.INQUIRY_TERMINATED:
-                System.out.println("Inquiry terminated.");
-                break;
-            case DiscoveryListener.INQUIRY_ERROR:
-                System.out.println("Inquiry error.");
-                break;
-            default:
-                System.out.println("Unknown Response Code");
-                break;
-        }
-    }
 }
