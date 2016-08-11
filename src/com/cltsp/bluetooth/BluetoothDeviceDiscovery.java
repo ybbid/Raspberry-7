@@ -1,6 +1,7 @@
 package com.cltsp.bluetooth;
 
-import com.cltsp.impl.DiscoveryListenerImpl;
+
+import com.cltsp.impl.DevDiscoveryListenerImpl;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
@@ -15,7 +16,6 @@ public class BluetoothDeviceDiscovery implements Runnable{
     /*Linkedlist 不是线程安全的,用来存储在线的蓝牙设备*/
     public final static LinkedList<RemoteDevice> remDevices=new LinkedList<>();
     public final static LocalDevice localDevice=getLocalDevice();
-
     //对象锁
     public final static Object dislock =new Object();
     private static boolean isSearched=false;
@@ -24,7 +24,6 @@ public class BluetoothDeviceDiscovery implements Runnable{
     }
 
     public static void startSearch(){
-        //确保只有一个线程
         if (!isSearched){
             Thread Search=new Thread(new BluetoothDeviceDiscovery());
             Search.start();
@@ -37,7 +36,7 @@ public class BluetoothDeviceDiscovery implements Runnable{
     public void run() {
         remDevices.clear();
         DiscoveryAgent agent=localDevice.getDiscoveryAgent();
-        DiscoveryListenerImpl listener=new DiscoveryListenerImpl();
+        DevDiscoveryListenerImpl listener=new DevDiscoveryListenerImpl();
         while (true){
             synchronized (dislock){
                 try {

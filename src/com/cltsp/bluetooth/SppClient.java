@@ -1,18 +1,10 @@
 package com.cltsp.bluetooth;
 
-import javax.microedition.io.Connector;
-import javax.microedition.io.StreamConnection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigInteger;
-import java.util.Arrays;
-
 /**
  * Created by leacher on 16-8-3.
  */
 public class SppClient {
-
+/*
     public static void main(String[] args) throws IOException {
         String serverURL;
         String[] searchArgs=null;
@@ -66,4 +58,5 @@ public class SppClient {
         }
         return ret;
     }
+    */
 }

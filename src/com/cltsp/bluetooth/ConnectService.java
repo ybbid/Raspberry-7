@@ -1,5 +1,8 @@
 package com.cltsp.bluetooth;
 
+import javax.bluetooth.RemoteDevice;
+import java.util.HashMap;
+
 import static com.cltsp.bluetooth.BluetoothDeviceDiscovery.remDevices;
 
 /**
@@ -7,20 +10,22 @@ import static com.cltsp.bluetooth.BluetoothDeviceDiscovery.remDevices;
  */
 public class ConnectService implements Runnable {
     public final static Object conlock=new Object();
-
+    private RemoteDevice lastDevice;
+    public final static HashMap<String,String> ConnetUrlmap=new HashMap<>();
     @Override
     public void run() {
-        synchronized (conlock){
-            try {
-                conlock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+       while (true){
+            System.out.println("等待设备搜索....");
+            synchronized (conlock){
+                try {
+                    conlock.wait();//拿到了锁,后来的设备拿不到连接锁。
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                lastDevice= remDevices.getLast();
             }
-            //取出刚刚发现的设备去建立连接
-            RFCOMMThread rt=new RFCOMMThread(remDevices.getLast());
-            rt.start();
+            (new ServicesSearchThread(lastDevice)).start();
         }
-
     }
 
     public static void main(String[] args) {

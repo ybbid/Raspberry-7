@@ -6,8 +6,8 @@ import javax.bluetooth.UUID;
  * Created by leacher on 16-8-8.
  */
 public class BluetoothUUID {
-    public static final UUID SerialPort=new UUID(0x1101);
-    public static final UUID OBEX_OBJECT_PUSH=new UUID(0x1105);
-    public static final UUID OBEX_FILE_TRANSFER=new UUID(0x1106);
+    public static final UUID Serial_Port_Profile=new UUID(0x1101);
+    public static final UUID Obex_Object_Push=new UUID(0x1105);
+    public static final UUID Obex_File_Transfer=new UUID(0x1106);
 }
 
