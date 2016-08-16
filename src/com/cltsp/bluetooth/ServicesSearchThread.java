@@ -10,12 +10,14 @@ public class ServicesSearchThread extends Thread{
     private String devAddr;
     private final Object lock=new Object();
     private long threadId=this.currentThread().getId();
+    private Object conlock;
     private ServicesSearchThread(){
 
     }
-    public ServicesSearchThread(RemoteDevice remoteDevice){
+    public ServicesSearchThread(RemoteDevice remoteDevice,Object conlock){
         this.remoteDevice=remoteDevice;
         this.devAddr=this.remoteDevice.getBluetoothAddress();
+        this.conlock=conlock;
     }
 
     @Override
@@ -60,7 +62,6 @@ public class ServicesSearchThread extends Thread{
         } catch (BluetoothStateException e) {
             e.printStackTrace();
         }
-
         synchronized (lock){
             try {
                 System.out.println("ServicesSearchThread "+threadId+" : wait service search completed...");
@@ -69,10 +70,9 @@ public class ServicesSearchThread extends Thread{
                 e.printStackTrace();
             }
         }
-
-
+        synchronized (conlock){
+            conlock.notifyAll();
+        }
         System.out.println("ServicesSearchThread "+threadId+" : search service in "+remoteDevice.getBluetoothAddress()+" end.");
-
     }
-
 }

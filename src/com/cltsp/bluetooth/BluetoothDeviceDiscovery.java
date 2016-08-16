@@ -31,7 +31,6 @@ public class BluetoothDeviceDiscovery implements Runnable{
         }
     }
 
-
     @Override
     public void run() {
         remDevices.clear();
@@ -48,7 +47,6 @@ public class BluetoothDeviceDiscovery implements Runnable{
             }
         }
     }
-
     private static LocalDevice getLocalDevice(){
         try {
             return LocalDevice.getLocalDevice();

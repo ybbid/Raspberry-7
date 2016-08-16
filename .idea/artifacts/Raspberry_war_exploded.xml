@@ -7,6 +7,10 @@
         <element id="directory" name="classes">
           <element id="module-output" name="Raspberry" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="bluecove-gpl-2.1.1-SNAPSHOT" />
+          <element id="library" level="project" name="bluecove-2.1.1-SNAPSHOT" />
+        </element>
       </element>
     </root>
   </artifact>

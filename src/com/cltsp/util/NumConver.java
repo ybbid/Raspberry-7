@@ -9,10 +9,25 @@ public class NumConver {
     /*进制转换*/
 
     public static String binary(byte[] bytes, int radix){
-        //// TODO: 16-8-8 二进制转换成radix进制字符串
+        // TODO: 16-8-8 二进制转换成radix进制字符串
         return (new BigInteger(1,bytes)).toString(radix);
     }
-
+    public static int HexStringToInt(String src){
+        // TODO: 16-8-16  16进制字符串,转换成16进制整形
+        if (0==src.indexOf("0x")){
+            src=src.replaceFirst("0x","");
+        }
+        Integer temp=Integer.parseInt(src,16);
+        return (int) temp.longValue();
+    }
+    public static long HexStringToLong(String src){
+        // TODO: 16-8-8  16进制字符串,转换成16进制长整形
+        if (0==src.indexOf("0x")){
+            src=src.replaceFirst("0x","");
+        }
+        Long temp=Long.parseLong(src,16);
+        return temp.longValue();
+    }
     public static byte[] HexStringToBinary(String src){
         // TODO: 16-8-8 16进制字符串,转换成二进制数组
         int m=0,n=0;
