@@ -7,10 +7,13 @@ import java.math.BigInteger;
  */
 public class NumConver {
     /*进制转换*/
-
     public static String binary(byte[] bytes, int radix){
         // TODO: 16-8-8 二进制转换成radix进制字符串
         return (new BigInteger(1,bytes)).toString(radix);
+    }
+    public static String HexStringToIntStr(String src){
+        // TODO: 16-8-16  6进制字符串,转换成10进制字符串
+        return binary(HexStringToBinary(src),10);
     }
     public static int HexStringToInt(String src){
         // TODO: 16-8-16  16进制字符串,转换成16进制整形

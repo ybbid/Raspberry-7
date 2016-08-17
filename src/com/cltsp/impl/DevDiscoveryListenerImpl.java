@@ -14,12 +14,16 @@ public class DevDiscoveryListenerImpl implements DiscoveryListener {
     public final static Object lock=new Object();
     @Override
     public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
-        //System.out.println("Device " + btDevice.getBluetoothAddress() + " found");
+        System.out.println("DiscoveryListener : Device " + remoteDevice.getBluetoothAddress() + " found.");
         synchronized (lock) {
 
             //tracelog 竟态条件会引起问题
             if (!remDevices.contains(remoteDevice)) {
                 remDevices.add(remoteDevice);
+                ConnectService cs=new ConnectService(remoteDevice);
+                cs.start();
+                System.out.println("DiscoveryListener : add "+remoteDevice.getBluetoothAddress()+"to online device list.");
+
                 /*synchronized (conlock){
                   conlock.notifyAll();
                 }
@@ -28,7 +32,6 @@ public class DevDiscoveryListenerImpl implements DiscoveryListener {
                 这里加一个让conlock等候的时候通知的代码
                 或者加一个线程休眠的代码
                 或者new Thread 处理*/
-                (new ConnectService(remoteDevice)).start();
             }
         }
     }

@@ -25,4 +25,12 @@ public class LFDateServ {
         String date=sdf.format((lf805_st+time_t)*1000);
         return date;
     }
+    public static String getNowTime(){
+        String datestr;
+        Date date=new Date();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        datestr=sdf.format(date.getTime()+8*3600*1000);
+        return datestr;
+    }
 }

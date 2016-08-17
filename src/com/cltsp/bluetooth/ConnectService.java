@@ -1,5 +1,8 @@
 package com.cltsp.bluetooth;
 
+import com.cltsp.bean.Turgoscope;
+import com.cltsp.impl.DevDiscoveryListenerImpl;
+import com.cltsp.util.LFDateServ;
 import com.cltsp.util.NumConver;
 
 import javax.bluetooth.RemoteDevice;
@@ -19,19 +22,22 @@ import static com.cltsp.util.NumConver.binary;
 public class ConnectService extends Thread {
     public final Object conlock=new Object();
     private RemoteDevice lastDevice;
-    private String macaddr=lastDevice.getBluetoothAddress();
+    private String macaddr;
     private long threadID=this.currentThread().getId();
     public final static HashMap<String,String> ConnetUrlmap=new HashMap<>();
     public ConnectService(RemoteDevice remoteDevice){
         this.lastDevice=remoteDevice;
+        this.macaddr=lastDevice.getBluetoothAddress();
     }
+
     @Override
     public void run() {
         if (ConnetUrlmap.containsKey(macaddr)){
             try {
                 ToConnet();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("ConnectService "+threadID+" : "+e.getMessage());
+                offlineDevice();
             }
         }else {
             (new ServicesSearchThread(lastDevice,conlock)).start();
@@ -45,33 +51,57 @@ public class ConnectService extends Thread {
             try {
                 ToConnet();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("ConnectService "+threadID+" : "+e.toString());
+                offlineDevice();
             }
         }
-
+        System.out.println("ConnectService "+threadID+" : Thread end.");
     }
+
     public void ToConnet() throws IOException {
         String servURL=ConnetUrlmap.get(macaddr);
-        System.out.println("ConnectService "+threadID+" : "+"Connect to "+servURL+"...");
-        StreamConnection streamConnection=(StreamConnection) Connector.open(servURL);
-        OutputStream ops=streamConnection.openOutputStream();
-        System.out.println("ConnectService "+threadID+" : "+"Send to "+servURL+"...");
-        String hexstr="cc96020301010002";
-        byte[] rq= NumConver.HexStringToBinary(hexstr);
-        ops.write(rq);
-        ops.flush();
-        //response
-        System.out.println("ConnectService "+threadID+" : "+"Wait "+servURL+"response...");
-        InputStream ins=streamConnection.openInputStream();
-        byte[] data=new byte[21];
-        ins.read(data);
-        //封装数据上传
-        byte[] hp= Arrays.copyOfRange(data,14,15);
-        byte[] lp=Arrays.copyOfRange(data,16,17);
-        byte[] hr=Arrays.copyOfRange(data,18,19);
-        System.out.println(binary(data,16));
-        System.out.println("16 进制　"+binary(hp,16)+" "+binary(lp,16)+" "+binary(hr,16));
-        System.out.println("10 进制　"+binary(hp,10)+" "+binary(lp,10)+" "+binary(hr,10));
-        System.out.println("ConnectService "+threadID+" : "+"Connect "+servURL+"completed.");
+        if(servURL!=null){
+            //流要关闭
+            System.out.println("ConnectService "+threadID+" : "+"Connect to "+servURL+"...");
+            StreamConnection streamConnection=(StreamConnection) Connector.open(servURL);
+            OutputStream ops=streamConnection.openOutputStream();
+            System.out.println("ConnectService "+threadID+" : "+"Send to "+servURL+"...");
+            String hexstr="cc96020301010002";
+            byte[] rq= NumConver.HexStringToBinary(hexstr);
+            ops.write(rq);
+            ops.flush();
+            ops.close();
+            //response
+            System.out.println("ConnectService "+threadID+" : "+"Wait "+servURL+" response...");
+            InputStream ins=streamConnection.openInputStream();
+            byte[] data=new byte[21];
+            ins.read(data);
+            //封装数据上传
+            Turgoscope turgoscope=new Turgoscope();
+            turgoscope.setDatetime(LFDateServ.getNowTime());
+            turgoscope.setMacAddress(macaddr);
+            turgoscope.setMaxBp(binary(Arrays.copyOfRange(data,14,15),10));
+            turgoscope.setMinBp(binary(Arrays.copyOfRange(data,16,17),10));
+            turgoscope.setHr(binary(Arrays.copyOfRange(data,18,19),10));
+            System.out.println("Test: "+turgoscope.getDatetime()+"\n"
+                    +turgoscope.getMaxBp()+"\n"
+                    +turgoscope.getMinBp()+"\n"
+                    +turgoscope.getHr());
+            System.out.println("ConnectService "+threadID+" : "+"Connect "+servURL+" completed.");
+            ins.close();
+            streamConnection.close();
+            offlineDevice();
+        }else {
+            System.out.println("ConnectService "+threadID+" : Not found service in "+macaddr);
+            offlineDevice();
+        }
+    }
+
+    public void offlineDevice(){
+        // TODO: 16-8-17  将连接完成的设备和不能连接的设备从在线设备list中删除
+        synchronized (DevDiscoveryListenerImpl.lock){
+            BluetoothDeviceDiscovery.remDevices.remove(lastDevice);
+        }
+        System.out.println("ConnectService "+threadID+" : "+"removed "+macaddr+" on online device list.");
     }
 }

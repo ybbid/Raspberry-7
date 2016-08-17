@@ -1,7 +1,8 @@
 package com.cltsp.servlet;
 
+import com.cltsp.bean.Turgoscope;
 import com.cltsp.util.LFDateServ;
-import org.json.JSONObject;
+import com.cltsp.util.NumConver;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 /**
  * Created by zclzc on 2016/7/14.
  */
@@ -26,23 +25,25 @@ public class LF805Server extends HttpServlet{
         {
             //lf805_pre是发数据前的握手协议
             //下面是对发来的数据进行处理
-
+            char datachar[]=data.toCharArray();
+            Turgoscope turgoscope=new Turgoscope();
+            turgoscope.setDatetime(LFDateServ.parseLfTime(
+                    String.copyValueOf(datachar,35,7)
+            ));
+            turgoscope.setMacAddress(
+                    String.copyValueOf(datachar,6,16)
+            );
+            turgoscope.setMaxBp(NumConver.HexStringToIntStr(
+                    String.copyValueOf(datachar,44,2))
+            );
+            turgoscope.setMinBp(NumConver.HexStringToIntStr(
+                    String.copyValueOf(datachar,46,2))
+            );
+            turgoscope.setHr(NumConver.HexStringToIntStr(
+                    String.copyValueOf(datachar,48,2))
+            );
             //模拟Http将数据发送到服务器端，PS：直接发送数据还是json文件.
             //构建Json
-            JSONObject lf805=new JSONObject(
-
-            );
-            URL serverUrl=new URL("");
-            HttpURLConnection con=(HttpURLConnection)serverUrl.openConnection();
-            con.setRequestProperty("Content-Type","application/json");//设定请求格式json
-            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) ...");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setRequestMethod("POST");
-            int respCode=con.getResponseCode();
-            if (respCode==200){
-
-            }
-            //请求失败将数据保存
         }
         PrintWriter pw=resp.getWriter();
         resp.setContentType("text/html");
