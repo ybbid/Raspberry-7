@@ -4,6 +4,7 @@ package com.cltsp.bean;
  * Created by leacher on 2016/7/23.
  */
 public class Turgoscope {
+    //血压实体
     /*JavaBean设计原则
     * 1.公有类
     * 2.属性私有
