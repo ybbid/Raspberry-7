@@ -1,2 +1,2 @@
-# bluecove-cn
-J2SE Bluetooth library bluecove 中文翻译
+# Raspberry
+Raspberry 上的一个项目
